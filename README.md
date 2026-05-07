@@ -1,7 +1,7 @@
 import http.server
 import socketserver
 
-HTML = '''<!DOCTYPE html>
+HTML = <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
