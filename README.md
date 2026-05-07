@@ -6,7 +6,7 @@ HTML = '''<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 For Aya - A Purrfect Surprise 🌸</title>
+    <title>🌸 For Aya - A Perfect Surprise 🌸</title>
     <style>
         * {
             margin: 0;
@@ -384,7 +384,7 @@ HTML = '''<!DOCTYPE html>
         <div class="box-content" id="boxContent">
             <div class="message-card">
                 <div class="heart-message">💖 LOVE U TWIN 💖</div>
-                <div class="sub-message">Aya, you're my purrfect match!</div>
+                <div class="sub-message">Aya, you're my perfect match!</div>
                 <div class="inner-cat-surprise">🐱🌸✨🐾</div>
             </div>
         </div>
