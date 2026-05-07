@@ -1,8 +1,11 @@
-<!DOCTYPE html>
+import http.server
+import socketserver
+
+HTML = '''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌸 For Aya - A Purrfect Surprise 🌸</title>
     <style>
         * {
@@ -24,7 +27,6 @@
             cursor: pointer;
         }
 
-        /* floating flowers */
         .flower-overlay {
             position: fixed;
             top: 0;
@@ -46,20 +48,10 @@
         }
 
         @keyframes floatFlower {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.8;
-            }
-            90% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(-20vh) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
         }
 
         .stage {
@@ -83,6 +75,7 @@
             filter: drop-shadow(0 20px 25px -8px rgba(0,0,0,0.2));
             transition: transform 0.2s ease;
         }
+
         .box-wrapper:active {
             transform: scale(0.98);
         }
@@ -147,6 +140,7 @@
             box-shadow: 0 6px 10px rgba(0,0,0,0.05), inset 0 1px 3px white;
             margin: 0 auto;
         }
+
         .cat-ears {
             position: absolute;
             top: -20px;
@@ -158,10 +152,12 @@
             border-bottom: 22px solid #fff2e6;
             filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
         }
+
         .cat-ears.right-ear {
             left: auto;
             right: 10px;
         }
+
         .cat-face {
             position: relative;
             display: flex;
@@ -169,6 +165,7 @@
             gap: 16px;
             top: 18px;
         }
+
         .eye {
             width: 8px;
             height: 10px;
@@ -176,6 +173,7 @@
             border-radius: 50%;
             position: relative;
         }
+
         .eye::after {
             content: "•";
             color: white;
@@ -184,6 +182,7 @@
             top: 1px;
             left: 1px;
         }
+
         .nose {
             width: 10px;
             height: 7px;
@@ -193,6 +192,7 @@
             top: 6px;
             left: 2px;
         }
+
         .whisker {
             position: absolute;
             width: 20px;
@@ -200,12 +200,15 @@
             background: #bba38e;
             top: 28px;
         }
+
         .whisker-left {
             left: -22px;
         }
+
         .whisker-right {
             right: -22px;
         }
+
         .tail {
             position: absolute;
             bottom: 8px;
@@ -303,12 +306,14 @@
             position: absolute;
             background: #f27c9e;
         }
+
         .ribbon-cross:before {
             width: 28px;
             height: 8px;
             top: 10px;
             left: 0;
         }
+
         .ribbon-cross:after {
             width: 8px;
             height: 28px;
@@ -339,45 +344,22 @@
         }
 
         @keyframes heartFloatUp {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(0.5);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-150px) scale(1.2);
-            }
+            0% { opacity: 1; transform: translateY(0) scale(0.5); }
+            100% { opacity: 0; transform: translateY(-150px) scale(1.2); }
         }
 
         @media (max-width: 500px) {
-            .box-wrapper {
-                width: 280px;
-                height: 260px;
-            }
-            .gift-box {
-                height: 150px;
-            }
-            .box-lid {
-                bottom: 130px;
-                height: 60px;
-            }
-            .message-card {
-                padding: 10px 18px;
-            }
-            .heart-message {
-                font-size: 1.5rem;
-            }
-            .cat-on-lid .cat-body {
-                width: 70px;
-                height: 45px;
-            }
+            .box-wrapper { width: 280px; height: 260px; }
+            .gift-box { height: 150px; }
+            .box-lid { bottom: 130px; height: 60px; }
+            .message-card { padding: 10px 18px; }
+            .heart-message { font-size: 1.5rem; }
+            .cat-on-lid .cat-body { width: 70px; height: 45px; }
         }
     </style>
 </head>
 <body>
-
 <div class="flower-overlay" id="flowerOverlay"></div>
-
 <div class="stage">
     <div class="box-wrapper" id="giftBoxWrapper">
         <div class="gift-box"></div>
@@ -399,7 +381,6 @@
             </div>
         </div>
         <div class="ribbon-cross"></div>
-        
         <div class="box-content" id="boxContent">
             <div class="message-card">
                 <div class="heart-message">💖 LOVE U TWIN 💖</div>
@@ -412,125 +393,155 @@
 </div>
 
 <script>
-    (function() {
-        const wrapper = document.getElementById('giftBoxWrapper');
-        const lid = document.getElementById('boxLid');
-        const hint = document.getElementById('hintText');
-        let isOpened = false;
-        
-        function createFloatingFlower() {
-            const flowers = ['🌸', '🌷', '🌺', '🌼', '🌸', '🌹', '💮', '🏵️', '🌻', '🌸', '🌷', '🌸'];
-            const randomFlower = flowers[Math.floor(Math.random() * flowers.length)];
-            const flowerDiv = document.createElement('div');
-            flowerDiv.className = 'floating-flower';
-            flowerDiv.innerHTML = randomFlower;
-            const size = Math.floor(Math.random() * 20 + 18);
-            flowerDiv.style.fontSize = size + 'px';
-            flowerDiv.style.left = Math.random() * 100 + '%';
-            const duration = Math.random() * 8 + 6;
-            flowerDiv.style.animationDuration = duration + 's';
-            flowerDiv.style.animationDelay = Math.random() * 5 + 's';
-            flowerDiv.style.opacity = Math.random() * 0.6 + 0.3;
-            document.getElementById('flowerOverlay').appendChild(flowerDiv);
-            
-            setTimeout(() => {
-                if(flowerDiv && flowerDiv.remove) flowerDiv.remove();
-            }, duration * 1000);
+(function() {
+    const wrapper = document.getElementById('giftBoxWrapper');
+    const lid = document.getElementById('boxLid');
+    const hint = document.getElementById('hintText');
+    let isOpened = false;
+    
+    function createFloatingFlower() {
+        const flowers = ['🌸', '🌷', '🌺', '🌼', '🌸', '🌹', '💮', '🏵️', '🌻', '🌸', '🌷', '🌸'];
+        const randomFlower = flowers[Math.floor(Math.random() * flowers.length)];
+        const flowerDiv = document.createElement('div');
+        flowerDiv.className = 'floating-flower';
+        flowerDiv.innerHTML = randomFlower;
+        const size = Math.floor(Math.random() * 20 + 18);
+        flowerDiv.style.fontSize = size + 'px';
+        flowerDiv.style.left = Math.random() * 100 + '%';
+        const duration = Math.random() * 8 + 6;
+        flowerDiv.style.animationDuration = duration + 's';
+        flowerDiv.style.animationDelay = Math.random() * 5 + 's';
+        flowerDiv.style.opacity = Math.random() * 0.6 + 0.3;
+        document.getElementById('flowerOverlay').appendChild(flowerDiv);
+        setTimeout(() => { if(flowerDiv && flowerDiv.remove) flowerDiv.remove(); }, duration * 1000);
+    }
+    
+    for(let i = 0; i < 15; i++) {
+        setTimeout(() => createFloatingFlower(), i * 400);
+    }
+    setInterval(() => { createFloatingFlower(); }, 1200);
+    
+    function burstPetals(x, y) {
+        for(let i = 0; i < 12; i++) {
+            const petal = document.createElement('div');
+            petal.innerHTML = Math.random() > 0.5 ? '🌸' : '🌼';
+            petal.style.position = 'fixed';
+            petal.style.left = (x + (Math.random() - 0.5) * 70) + 'px';
+            petal.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
+            petal.style.fontSize = (Math.random() * 18 + 12) + 'px';
+            petal.style.pointerEvents = 'none';
+            petal.style.zIndex = '999';
+            petal.style.opacity = '0.9';
+            petal.style.transition = 'all 0.8s ease-out';
+            document.body.appendChild(petal);
+            requestAnimationFrame(() => {
+                petal.style.transform = `translateY(${Math.random() * -120 - 40}px) translateX(${(Math.random() - 0.5) * 100}px) rotate(${Math.random() * 200}deg)`;
+                petal.style.opacity = '0';
+            });
+            setTimeout(() => petal.remove(), 900);
         }
-        
-        for(let i = 0; i < 15; i++) {
-            setTimeout(() => createFloatingFlower(), i * 400);
+    }
+    
+    function heartExplosion() {
+        for(let i = 0; i < 38; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.innerHTML = ['❤️', '💖', '💗', '🌸', '💕', '💘', '💝', '🐱'][Math.floor(Math.random()*8)];
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.bottom = '20px';
+            heart.style.fontSize = (Math.random() * 24 + 18) + 'px';
+            heart.style.animation = `heartFloatUp 1.4s ease-out forwards`;
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1500);
         }
-        setInterval(() => {
-            createFloatingFlower();
-        }, 1200);
-        
-        function burstPetals(x, y) {
-            for(let i=0; i<12; i++) {
-                const petal = document.createElement('div');
-                petal.innerHTML = Math.random() > 0.5 ? '🌸' : '🌼';
-                petal.style.position = 'fixed';
-                petal.style.left = (x + (Math.random() - 0.5) * 70) + 'px';
-                petal.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
-                petal.style.fontSize = (Math.random() * 18 + 12) + 'px';
-                petal.style.pointerEvents = 'none';
-                petal.style.zIndex = '999';
-                petal.style.opacity = '0.9';
-                petal.style.transition = 'all 0.8s ease-out';
-                document.body.appendChild(petal);
-                requestAnimationFrame(() => {
-                    petal.style.transform = `translateY(${Math.random() * -120 - 40}px) translateX(${(Math.random() - 0.5) * 100}px) rotate(${Math.random() * 200}deg)`;
-                    petal.style.opacity = '0';
-                });
-                setTimeout(() => petal.remove(), 900);
-            }
-        }
-        
-        function heartExplosion() {
-            for(let i=0; i<38; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'floating-heart';
-                heart.innerHTML = ['❤️', '💖', '💗', '🌸', '💕', '💘', '💝', '🐱'][Math.floor(Math.random()*8)];
-                heart.style.left = Math.random() * window.innerWidth + 'px';
-                heart.style.bottom = '20px';
-                heart.style.fontSize = (Math.random() * 24 + 18) + 'px';
-                document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 1500);
-            }
-        }
-        
-        function openBox(e) {
-            if(isOpened) return;
-            isOpened = true;
-            wrapper.classList.add('open');
-            
-            hint.innerHTML = '💞 Aya! You opened the magic! I love you twin! 💞';
-            hint.style.background = '#ffecf0';
-            hint.style.color = '#d43f6b';
-            
-            heartExplosion();
-            
-            const rect = wrapper.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            burstPetals(centerX, centerY);
-            
-            setTimeout(() => {
-                for(let i=0; i<25; i++) {
-                    const extraFlower = document.createElement('div');
-                    extraFlower.innerHTML = ['🌸','🌷','🌼','🌺','🌸','💖'][Math.floor(Math.random()*6)];
-                    extraFlower.style.position = 'fixed';
-                    extraFlower.style.left = Math.random() * window.innerWidth + 'px';
-                    extraFlower.style.top = '-30px';
-                    extraFlower.style.fontSize = (Math.random() * 20 + 15) + 'px';
-                    extraFlower.style.pointerEvents = 'none';
-                    extraFlower.style.zIndex = '100';
-                    extraFlower.style.animation = `floatFlower 1.6s linear forwards`;
-                    extraFlower.style.animationDuration = Math.random() * 1.8 + 1.2 + 's';
-                    document.body.appendChild(extraFlower);
-                    setTimeout(() => extraFlower.remove(), 2000);
-                }
-            }, 200);
-        }
-        
-        wrapper.addEventListener('click', openBox);
-        lid.addEventListener('click', openBox);
-        
-        document.body.addEventListener('click', function(e) {
-            if(!isOpened && (e.target === document.body || e.target.classList?.contains('click-hint') || e.target === hint)) {
-                burstPetals(e.clientX, e.clientY);
-            }
-        });
+    }
+    
+    function openBox(e) {
+        if(isOpened) return;
+        isOpened = true;
+        wrapper.classList.add('open');
+        hint.innerHTML = '💞 Aya! You opened the magic! I love you twin! 💞';
+        hint.style.background = '#ffecf0';
+        hint.style.color = '#d43f6b';
+        heartExplosion();
+        const rect = wrapper.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        burstPetals(centerX, centerY);
         
         setTimeout(() => {
-            for(let i=0;i<30;i++) {
-                createFloatingFlower();
+            for(let i = 0; i < 25; i++) {
+                const extraFlower = document.createElement('div');
+                extraFlower.innerHTML = ['🌸','🌷','🌼','🌺','🌸','💖'][Math.floor(Math.random()*6)];
+                extraFlower.style.position = 'fixed';
+                extraFlower.style.left = Math.random() * window.innerWidth + 'px';
+                extraFlower.style.top = '-30px';
+                extraFlower.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                extraFlower.style.pointerEvents = 'none';
+                extraFlower.style.zIndex = '100';
+                extraFlower.style.animation = `floatFlower 1.6s linear forwards`;
+                extraFlower.style.animationDuration = Math.random() * 1.8 + 1.2 + 's';
+                document.body.appendChild(extraFlower);
+                setTimeout(() => extraFlower.remove(), 2000);
             }
-        }, 600);
-        
-        lid.style.cursor = 'pointer';
-        wrapper.style.cursor = 'pointer';
-    })();
+        }, 200);
+    }
+    
+    wrapper.addEventListener('click', openBox);
+    lid.addEventListener('click', openBox);
+    
+    let extraLoveInterval = null;
+    function startPostOpenLove() {
+        if(extraLoveInterval) clearInterval(extraLoveInterval);
+        extraLoveInterval = setInterval(() => {
+            if(isOpened && Math.random() < 0.5) {
+                for(let i = 0; i < 6; i++) {
+                    const heartItem = document.createElement('div');
+                    heartItem.innerHTML = '💖';
+                    heartItem.style.position = 'fixed';
+                    heartItem.style.left = Math.random() * window.innerWidth + 'px';
+                    heartItem.style.bottom = '10px';
+                    heartItem.style.fontSize = '24px';
+                    heartItem.style.pointerEvents = 'none';
+                    heartItem.style.zIndex = '99';
+                    heartItem.style.animation = 'heartFloatUp 1.2s ease-out forwards';
+                    document.body.appendChild(heartItem);
+                    setTimeout(() => heartItem.remove(), 1200);
+                }
+            }
+        }, 5400);
+    }
+    
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mut) => {
+            if(mut.attributeName === 'class' && wrapper.classList.contains('open') && !extraLoveInterval) {
+                startPostOpenLove();
+            }
+        });
+    });
+    observer.observe(wrapper, { attributes: true });
+    
+    setTimeout(() => {
+        for(let i = 0; i < 30; i++) {
+            createFloatingFlower();
+        }
+    }, 600);
+})();
 </script>
 </body>
-</html>
+</html>'''
+
+PORT = 8080
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(HTML.encode())
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print(f"🌸 Server running at http://localhost:{PORT} 🌸")
+    print("Press Ctrl+C to stop")
+    httpd.serve_forever()
+```
