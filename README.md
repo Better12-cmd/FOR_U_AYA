@@ -1,6 +1,3 @@
-Here is an HTML document that creates an interactive "open the box" animation with a cute cat, flowers, and a heartfelt message for your friend Aya.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +9,7 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* prevents accidental text selection, keeps it clean */
+            user-select: none;
         }
 
         body {
@@ -21,13 +18,13 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, 'Comic Neue', 'Poppins', cursive;
+            font-family: 'Segoe UI', 'Quicksand', system-ui, 'Comic Neue', cursive;
             overflow-x: hidden;
             position: relative;
             cursor: pointer;
         }
 
-        /* floating flowers canvas & absolute decorations */
+        /* floating flowers */
         .flower-overlay {
             position: fixed;
             top: 0;
@@ -65,7 +62,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             }
         }
 
-        /* main stage container */
         .stage {
             position: relative;
             z-index: 30;
@@ -78,7 +74,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             padding: 20px;
         }
 
-        /* box container */
         .box-wrapper {
             position: relative;
             width: 360px;
@@ -92,7 +87,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             transform: scale(0.98);
         }
 
-        /* base of the box (front & sides illusion) */
         .gift-box {
             position: absolute;
             bottom: 0;
@@ -105,10 +99,9 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             z-index: 2;
         }
 
-        /* lid of the box */
         .box-lid {
             position: absolute;
-            bottom: 160px; /* sits right on top */
+            bottom: 160px;
             left: -8px;
             width: calc(100% + 16px);
             height: 70px;
@@ -121,7 +114,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             cursor: pointer;
         }
 
-        /* lid decoration (ribbon piece) */
         .lid-ribbon {
             position: absolute;
             width: 20px;
@@ -134,16 +126,15 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
-        /* the cute white cat lying on the lid */
         .cat-on-lid {
             position: absolute;
-            bottom: 20px;  /* sits on top of lid */
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 100px;
             height: 80px;
             z-index: 12;
-            pointer-events: none;  /* so clicking still triggers box open */
+            pointer-events: none;
             transition: all 0.3s ease;
         }
 
@@ -226,8 +217,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             transform: rotate(25deg);
         }
 
-        /* closed state cat is happy and visible */
-        /* opened state: cat goes with lid? we'll move it away smoothly */
         .box-wrapper.open .cat-on-lid {
             opacity: 0;
             transform: translateX(-50%) translateY(-40px) scale(0.8);
@@ -236,10 +225,8 @@ Here is an HTML document that creates an interactive "open the box" animation wi
 
         .box-wrapper.open .box-lid {
             transform: rotateX(-70deg) translateY(-10px);
-            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1.2);
         }
 
-        /* inside the box: surprise message + new cat emerges */
         .box-content {
             position: absolute;
             bottom: 20px;
@@ -297,7 +284,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             filter: drop-shadow(0 2px 5px pink);
         }
 
-        /* ribbon on box */
         .ribbon-cross {
             position: absolute;
             width: 28px;
@@ -330,7 +316,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             left: 10px;
         }
 
-        /* instructions soft */
         .click-hint {
             margin-top: 40px;
             font-size: 1rem;
@@ -342,11 +327,9 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             color: #b84c6c;
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(255,105,150,0.2);
-            transition: all 0.2s;
             pointer-events: none;
         }
 
-        /* extra floating hearts after opening (JS) */
         .floating-heart {
             position: fixed;
             font-size: 28px;
@@ -366,7 +349,6 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             }
         }
 
-        /* for responsiveness */
         @media (max-width: 500px) {
             .box-wrapper {
                 width: 280px;
@@ -398,13 +380,10 @@ Here is an HTML document that creates an interactive "open the box" animation wi
 
 <div class="stage">
     <div class="box-wrapper" id="giftBoxWrapper">
-        <!-- Gift Box bottom part -->
         <div class="gift-box"></div>
-        <!-- Lid (can be clicked open) -->
         <div class="box-lid" id="boxLid">
             <div class="lid-ribbon"></div>
         </div>
-        <!-- Cute white cat lying on lid -->
         <div class="cat-on-lid" id="sleepingCat">
             <div class="cat-body">
                 <div class="cat-ears"></div>
@@ -419,10 +398,8 @@ Here is an HTML document that creates an interactive "open the box" animation wi
                 <div class="tail"></div>
             </div>
         </div>
-        <!-- ribbon decoration -->
         <div class="ribbon-cross"></div>
         
-        <!-- Inside content that shows once opened -->
         <div class="box-content" id="boxContent">
             <div class="message-card">
                 <div class="heart-message">💖 LOVE U TWIN 💖</div>
@@ -436,52 +413,45 @@ Here is an HTML document that creates an interactive "open the box" animation wi
 
 <script>
     (function() {
-        // DOM elements
         const wrapper = document.getElementById('giftBoxWrapper');
         const lid = document.getElementById('boxLid');
         const hint = document.getElementById('hintText');
         let isOpened = false;
         
-        // Flower generation system (continuous floating flowers)
         function createFloatingFlower() {
             const flowers = ['🌸', '🌷', '🌺', '🌼', '🌸', '🌹', '💮', '🏵️', '🌻', '🌸', '🌷', '🌸'];
             const randomFlower = flowers[Math.floor(Math.random() * flowers.length)];
             const flowerDiv = document.createElement('div');
             flowerDiv.className = 'floating-flower';
             flowerDiv.innerHTML = randomFlower;
-            const size = Math.floor(Math.random() * 20 + 18); // 18px - 38px
+            const size = Math.floor(Math.random() * 20 + 18);
             flowerDiv.style.fontSize = size + 'px';
             flowerDiv.style.left = Math.random() * 100 + '%';
-            const duration = Math.random() * 8 + 6; // 6-14 seconds
+            const duration = Math.random() * 8 + 6;
             flowerDiv.style.animationDuration = duration + 's';
             flowerDiv.style.animationDelay = Math.random() * 5 + 's';
             flowerDiv.style.opacity = Math.random() * 0.6 + 0.3;
             document.getElementById('flowerOverlay').appendChild(flowerDiv);
             
-            // remove after animation ends to avoid memory bloating
             setTimeout(() => {
                 if(flowerDiv && flowerDiv.remove) flowerDiv.remove();
             }, duration * 1000);
         }
         
-        // generate initial batch of flowers and keep spawning
         for(let i = 0; i < 15; i++) {
             setTimeout(() => createFloatingFlower(), i * 400);
         }
-        // continuous flower rain
         setInterval(() => {
-            if(document.hasFocus()) createFloatingFlower();
-            else createFloatingFlower(); // still nice anyway
+            createFloatingFlower();
         }, 1200);
         
-        // Also create extra random petals on window load
-        function burstPetals(localX, localY) {
+        function burstPetals(x, y) {
             for(let i=0; i<12; i++) {
                 const petal = document.createElement('div');
                 petal.innerHTML = Math.random() > 0.5 ? '🌸' : '🌼';
                 petal.style.position = 'fixed';
-                petal.style.left = (localX + (Math.random() - 0.5) * 70) + 'px';
-                petal.style.top = (localY + (Math.random() - 0.5) * 60) + 'px';
+                petal.style.left = (x + (Math.random() - 0.5) * 70) + 'px';
+                petal.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
                 petal.style.fontSize = (Math.random() * 18 + 12) + 'px';
                 petal.style.pointerEvents = 'none';
                 petal.style.zIndex = '999';
@@ -496,65 +466,35 @@ Here is an HTML document that creates an interactive "open the box" animation wi
             }
         }
         
-        // heart explosion upon opening
         function heartExplosion() {
-            const heartCount = 38;
-            for(let i=0; i<heartCount; i++) {
+            for(let i=0; i<38; i++) {
                 const heart = document.createElement('div');
                 heart.className = 'floating-heart';
                 heart.innerHTML = ['❤️', '💖', '💗', '🌸', '💕', '💘', '💝', '🐱'][Math.floor(Math.random()*8)];
                 heart.style.left = Math.random() * window.innerWidth + 'px';
                 heart.style.bottom = '20px';
                 heart.style.fontSize = (Math.random() * 24 + 18) + 'px';
-                const driftX = (Math.random() - 0.5) * 150;
-                heart.style.setProperty('--drift', driftX + 'px');
-                heart.style.animation = `heartFloatUp 1.4s ease-out forwards`;
                 document.body.appendChild(heart);
                 setTimeout(() => heart.remove(), 1500);
             }
         }
         
-        // additional flower burst at click location for extra cuteness
-        function handleFlowerBurst(e) {
-            if(!isOpened) {
-                let clientX, clientY;
-                if(e.touches) {
-                    clientX = e.touches[0].clientX;
-                    clientY = e.touches[0].clientY;
-                } else {
-                    clientX = e.clientX;
-                    clientY = e.clientY;
-                }
-                burstPetals(clientX, clientY);
-            } else {
-                // even if opened, we can tiny celebratory flowers
-                let x = e.clientX || (e.touches ? e.touches[0].clientX : window.innerWidth/2);
-                let y = e.clientY || (e.touches ? e.touches[0].clientY : window.innerHeight/2);
-                burstPetals(x, y);
-            }
-        }
-        
-        // main open function
         function openBox(e) {
             if(isOpened) return;
             isOpened = true;
             wrapper.classList.add('open');
             
-            // change hint text after opening
             hint.innerHTML = '💞 Aya! You opened the magic! I love you twin! 💞';
             hint.style.background = '#ffecf0';
             hint.style.color = '#d43f6b';
             
-            // play with sweet animation - heart & flower burst
             heartExplosion();
             
-            // extra flower burst from box center
             const rect = wrapper.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             burstPetals(centerX, centerY);
             
-            // after a short delay, add extra falling petals effect from top
             setTimeout(() => {
                 for(let i=0; i<25; i++) {
                     const extraFlower = document.createElement('div');
@@ -571,119 +511,26 @@ Here is an HTML document that creates an interactive "open the box" animation wi
                     setTimeout(() => extraFlower.remove(), 2000);
                 }
             }, 200);
-            
-            // Also remove cat on lid completely after transition (already hidden via CSS)
-            // we can also add a soundless visual: show a new cat inside content area? Already inner-cat-surprise has cat icon.
-            // Extra: add moving little sparkle inside message
-            const messageDiv = document.querySelector('.heart-message');
-            if(messageDiv) {
-                messageDiv.style.transform = "scale(1.05)";
-                setTimeout(() => {
-                    if(messageDiv) messageDiv.style.transform = "";
-                }, 300);
-            }
         }
         
-        // event listeners: click on wrapper or lid 
-        function handleOpenTrigger(e) {
-            if(isOpened) {
-                // just for fun, if already opened, throw extra love hearts
-                const rand = Math.random() * 100;
-                if(rand < 40) {
-                    heartExplosion();
-                    burstPetals(e.clientX || (window.innerWidth/2), e.clientY || (window.innerHeight/2));
-                }
-                return;
-            }
-            e.stopPropagation();
-            openBox(e);
-        }
+        wrapper.addEventListener('click', openBox);
+        lid.addEventListener('click', openBox);
         
-        wrapper.addEventListener('click', handleOpenTrigger);
-        lid.addEventListener('click', handleOpenTrigger);
-        
-        // touch for mobile: also add flower burst on each tap before opened
-        wrapper.addEventListener('touchstart', (e) => {
-            if(!isOpened) {
-                // small visual
-                const touch = e.touches[0];
-                burstPetals(touch.clientX, touch.clientY);
-            }
-        });
-        
-        // additional random floating hearts periodically after opening? for cuteness, if opened add extra animation interval
-        let extraLoveInterval = null;
-        function startPostOpenLove() {
-            if(extraLoveInterval) clearInterval(extraLoveInterval);
-            extraLoveInterval = setInterval(() => {
-                if(isOpened && document.body) {
-                    // 20% chance each 8 sec to throw love hearts
-                    if(Math.random() < 0.5) {
-                        for(let i=0;i<6;i++) {
-                            const heartItem = document.createElement('div');
-                            heartItem.innerHTML = '💖';
-                            heartItem.style.position = 'fixed';
-                            heartItem.style.left = Math.random() * window.innerWidth + 'px';
-                            heartItem.style.bottom = '10px';
-                            heartItem.style.fontSize = '24px';
-                            heartItem.style.pointerEvents = 'none';
-                            heartItem.style.zIndex = '99';
-                            heartItem.style.animation = 'heartFloatUp 1.2s ease-out forwards';
-                            document.body.appendChild(heartItem);
-                            setTimeout(() => heartItem.remove(), 1200);
-                        }
-                    }
-                }
-            }, 5400);
-        }
-        
-        // observe when open state changes: we start love drops after opening state
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mut) => {
-                if(mut.attributeName === 'class' && wrapper.classList.contains('open') && !extraLoveInterval) {
-                    startPostOpenLove();
-                }
-            });
-        });
-        observer.observe(wrapper, { attributes: true });
-        
-        // initial fun: send a gentle click reminder w/ floating flowers on body click
         document.body.addEventListener('click', function(e) {
             if(!isOpened && (e.target === document.body || e.target.classList?.contains('click-hint') || e.target === hint)) {
-                // subtle encouragement, random petals
                 burstPetals(e.clientX, e.clientY);
             }
         });
         
-        // fallback for mouse movement cute interact? but not needed, but adds more flowers on document click
-        // but we also want flowers for Aya anytime she clicks: extra fun
-        document.addEventListener('click', (e) => {
-            // avoid double bursting from main box open already triggered, but we add only if target not box related? 
-            // but we already burst in open trigger. just tiny random magic.
-            if(!isOpened && Math.random() > 0.6 && !wrapper.contains(e.target)) {
-                burstPetals(e.clientX, e.clientY);
-            } else if(isOpened && Math.random() > 0.7) {
-                // even after opening let some love burst
-                burstPetals(e.clientX, e.clientY);
-            }
-        });
-        
-        // preload initial frame: adjust lid subtle shadow, all set
-        console.log("Ready for Aya~ 🐱💗");
-        
-        // manually add extra layer for more pink & flowers background (extra floating stars)
-        // Plus we want to also generate tiny sparkles after 2 seconds for extra charm
         setTimeout(() => {
             for(let i=0;i<30;i++) {
                 createFloatingFlower();
             }
         }, 600);
         
-        // for Mobile ensure clicks on lid work fine: ensure no double open issues
         lid.style.cursor = 'pointer';
         wrapper.style.cursor = 'pointer';
     })();
 </script>
 </body>
 </html>
-```
